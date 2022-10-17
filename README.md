@@ -1,2 +1,2 @@
-# solana-protocol
-Technical documentation describing the Solana protocol specification
+# Specs
+Solana protocol specification
