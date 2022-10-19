@@ -12,11 +12,11 @@ This repository hosts protocol specifications of the Solana network, maintained 
 |       *[p2p]* | Validator network protocols             |
 |       *[api]* | Client-facing node APIs (e.g. JSON-RPC) |
 
-  [core]: ./core/index.md
-  [consensus]: ./consensus/index.md
-  [runtime]: ./runtime/index.md
-  [p2p]: ./p2p/index.md
-  [api]: ./api/index.md
+  [core]: ./core/
+  [consensus]: ./consensus/
+  [runtime]: ./runtime/
+  [p2p]: ./p2p/
+  [api]: ./api/
 
 ## Community
 
