@@ -1,0 +1,7 @@
+# The "code owners" files ensures that each part of the spec is reviewed by subject experts.
+
+# See GitHub docs:
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners#about-code-owners
+
+# Solana Labs VM team
+/runtime/sbf/ @Lichtso @alessandrod
