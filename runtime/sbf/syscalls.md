@@ -22,6 +22,10 @@ Each syscall has a symbol name (useful for C linkage) and a 32-bit hash identifi
 The hash function is [murmur3](https://en.wikipedia.org/wiki/MurmurHash#MurmurHash3) in 32-bit mode
 using the symbol name as an input (ASCII, no delimiter).
 
+See [syscalls.csv](./syscalls.csv) for the current list.
+
+<!-- To add a new syscall, modify syscalls_gen.py and rerun. -->
+
 ## Reference
 
 ### `abort`
