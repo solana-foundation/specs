@@ -68,19 +68,68 @@ Data is encrypted using TLS 1.3, defined by [RFC 8446].
 
 ### Connection Parameters
 
-**TLS ciphersuites**
+**Compliance**
 
-Refer to [RFC 8446 Section 9.1](https://datatracker.ietf.org/doc/html/rfc8446#section-9.1) for Mandatory-to-Implement Cipher Suites.
+The QUIC/TPU protocol does not aim to be fully TLS-compliant ([RFC 8446 Section 9]).
 
-Additional ciphersuites may be supported and advertised in cryptographic negotiation.
+Peers must support the following cipher suites:
+- `TLS_AES_128_GCM_SHA256` (0x1301, TLS 1.3)
+- `TLS_CHACHA20_POLY1305_SHA256` (0x1303, TLS 1.3)
+
+Peers should not negotiate any deprecated TLS 1.2 cipher suites.
+
+Peers must support the following cryptographic schemes:
+- digital signature schemes
+  - `ed25519` (0x0807)
+- key exchange groups
+  - `x25519` (29)
+
+Peers are not required to support any additional cryptographic schemes.
+Contrary to [RFC 8446 Section 9.1], the following cryptographic schemes are optional:
+- digital signature schemes
+  - `rsa_pkcs1_sha256` (0x0401)
+  - `ecdsa_secp256r1_sha256` (0x0403)
+  - `rsa_pss_rsae_sha256` (0x0804)
+- key exchange groups
+  - `secp256r1` (23)
+
+Refer to the [IANA TLS Parameters](https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml) for an authoritative list of identifiers.
+
+  [RFC 8446 Section 9]: https://datatracker.ietf.org/doc/html/rfc8446#section-9
+  [RFC 8446 Section 9.1]: https://datatracker.ietf.org/doc/html/rfc8446#section-9.1
+
+**Key Exchange**
+
+Clients must include an X25519 key share in the initial ClientHello message.
+
+Failure to do so may result in an additional handshake round trip or an aborted connection.
+
+**Application-Layer Protocol Negotiation**
+
+The TLS ClientHello and ServerHello messages must include the ALPN protocol ID `solana-tpu`.
+The server must reject connections that fail to advertise ALPN accordingly.
+
+**Transport parameters**
+
+On connection creation, peers should set appropriate quotas via the QUIC transport parameters TLS extension.
+
+Recommended server-side parameters:
+- `initial_max_stream_data_uni` (0x07): 1232 (Max transaction size)
+
+The following parameters should be omitted (defaulting to 0) or explicitly set to 0:
+- `initial_max_data` (0x04), omit on client only
+- `initial_max_stream_data_bidi_local` (0x05)
+- `initial_max_stream_data_bidi_remote` (0x06)
+- `initial_max_streams_bidi` (0x08)
+
+Refer to [RFC 9000 Section 18.2](https://www.rfc-editor.org/rfc/rfc9000.html#name-transport-parameter-definit) for transport parameter definitions.
 
 **Send quota**
 
-In QUIC, clients are only permitted to send as much data as specified via quota messages.
+In QUIC, senders are only allowed to transmit as much data as specified via quotas by the receiver.
 If any quota is violated, the server should close the connection.
 
-On connection creation, the server should advertise non-zero [`MAX_DATA`] and [`MAX_STREAMS`] quotas.
-Both quotas should be continually replenished.
+The [`MAX_DATA`] and [`MAX_STREAMS`] quotas should be continually replenished by the server side.
 
   [`MAX_DATA`]: https://www.rfc-editor.org/rfc/rfc9000.html#name-max_data-frames
   [`MAX_STREAMS`]: https://www.rfc-editor.org/rfc/rfc9000.html#name-max_streams-frames
