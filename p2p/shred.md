@@ -193,7 +193,7 @@ Set to the number of coding shreds in the FEC set to which this packet belongs.
 Every coding shred in a set must have the same value in this field.
 
 #### Field: FEC set position
-Identifies which Reed-Solomon shard this packet contains.
+Identifies which Reed-Solomon shred this packet contains.
 Must be in the range $[0, \texttt{num}\textunderscore\texttt{coding}\textunderscore\texttt{shreds})$.
 This field was not present and set to 0 prior to https://github.com/solana-labs/solana/pull/27136.
 Every coding shred in a set must have a unique value in this field.
