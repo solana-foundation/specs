@@ -56,7 +56,7 @@ The network uses separate classes of TPU traffic for QoS.
 - The **TPUfwd** class is user transactions that the previous leader did not fully process.
 
 ## TPU/QUIC protocol v1
-	
+
 TPU/QUIC relays transactions over the QUIC transport protocol.
 
 QUIC is defined by [RFC 9000] and runs on UDP networks.
@@ -144,7 +144,7 @@ TPU/QUIC servers should accept stream data of up to the maximum transaction size
 #### Single-packet transactions
 
 One or more small transactions can be transmitted in a single QUIC 1-RTT packet.
-	
+
 **Example QUIC frame**
 
 ```
@@ -217,7 +217,7 @@ STREAM Frame {
 ```
 
 #### Acknowledgement
-	
+
 `STREAM` frames sent by clients are ack-eliciting.
 Refer to [RFC 9000 Section 13.2.1] for obligations on sending `ACK` frames.
 

@@ -44,7 +44,7 @@ Each field is byte-aligned. Integer byte order is little-endian.
 
 The `SHRED_SZ_MAX` constant is defined as 1228.
 
-If using Legacy authentication, 
+If using Legacy authentication,
 each shred occupies `SHRED_SZ_MAX` bytes when serialized.
 If using Merkle authentication, coding shreds occupy `SHRED_SZ_MAX` bytes,
 and data shreds occupy 1203 bytes.
@@ -71,7 +71,7 @@ The signature authenticates the fact that a shred originated from the current bl
 
 The block producer's public key is sourced externally.
 
-The content of the signed message used to create the signature depends on the authentication scheme used: 
+The content of the signed message used to create the signature depends on the authentication scheme used:
 
 * In the legacy authentication scheme, the block producer signs the content of each shred.
 The message to be signed begins 64 bytes past the beginning of the common shred header (i.e. skipping the signature field) and spans the entire rest of the shred, including any zero padding.
@@ -225,8 +225,8 @@ and the associated metadata is computed.
 First, we must compute $S$, the size of the payload of each data shred.
 * For shreds using the Legacy authentication scheme, $S$ has a hardcoded value of 1051.
 This is small enough to ensure that they payload of a code shred can cover the data shred's headers while still fitting in 1228 bytes.
-* For shreds using the Merkle authentication scheme, $S = 1095 - 20 \lceil \log_2 (N+K) \rceil$, 
-where $N+K$ is the total number of data and code shreds in the FEC set 
+* For shreds using the Merkle authentication scheme, $S = 1095 - 20 \lceil \log_2 (N+K) \rceil$,
+where $N+K$ is the total number of data and code shreds in the FEC set
 (see next section for details.
 Unfortunately, this means the definition is somewhat circular,
 and $S$ is only constant for a specific FEC set,
@@ -235,12 +235,12 @@ This implies that when using Merkle authentication,
 the shredding and erasure coding steps are not entirely independent.
 In order to preserve clarity of presentation, we will describe them separately.)
 
-Let $\ell$ be the length in bytes of the serialized entry batch and 
+Let $\ell$ be the length in bytes of the serialized entry batch and
 $x_0, x_1, \ldots,  x_{\ell-1}$ be the serialized entry batch bytes.
 
 Then the payload of the $i$ th data shred is $x_{iS}, x_{iS+1}, \ldots, x_{(i+1)S-1}$
 for $0\le i < \lfloor{\ell/S}\rfloor$.
-If $\ell$ is not divisible by $S$, then the final payload is 0-padded to $S$ bytes, i.e. 
+If $\ell$ is not divisible by $S$, then the final payload is 0-padded to $S$ bytes, i.e.
 $x_{\lfloor{\ell/S}\rfloor S}, x_{\lfloor{\ell/S}\rfloor S+1}, \ldots, x_{\ell-1}, \underbrace{0, 0, \; \ldots\;, 0}_{\ell-S\lfloor{\ell/S}\rfloor bytes}$.
 
 
@@ -250,18 +250,18 @@ The shred index of the first shred in a subsequent batch is one larger than the 
 That is, shred indices increase monotonically without resetting at each batch.
 
 
-The last data shred of each batch has the "batch complete" bit set. 
+The last data shred of each batch has the "batch complete" bit set.
 This field can be extracted using data flags bit `0x40`.
 
-The last data shred of the block has the "block complete" bit set. 
+The last data shred of the block has the "block complete" bit set.
 This field can be extracted using data flags bit `0x80`.
-Since a block contains an integral number of entry batches, 
+Since a block contains an integral number of entry batches,
 the last data shred of the block must also be the last data shred of a batch.
 
 The "batch tick number" of all shreds in a batch is set to the
 number of PoH ticks that have passed since the beginning of the slot
 for the first entry in the batch.
-Since Solana has 64 ticks per slot, this field cannot overflow. 
+Since Solana has 64 ticks per slot, this field cannot overflow.
 This field can be extracted using data flags bit field with mask `0x3f`.
 When the "block complete" flag is set to 1, "batch tick number" may be set to 0.
 
@@ -332,7 +332,7 @@ y_{1,b} \\
 \vdots \\
 y_{K-1,b}  \end{array} \right).$$
 
-The matrix $M$ depends only on $N$ and $K$. 
+The matrix $M$ depends only on $N$ and $K$.
 There are various ways to compute $M$, but one description is
 
 $$
@@ -349,7 +349,7 @@ N^0 & N^1 & \cdots & N^{N-1} \\
 (N-1)^0 & (N-1)^1 & (N-1)^2 &  \cdots & (N-1)^{N-1}  \end{array} \right)^{-1}
 $$
 
-where the base and exponent computations are integer arithmetic, 
+where the base and exponent computations are integer arithmetic,
 but the exponentiation, matrix inverse, and matrix multiplication are finite field operations.
 That is, $M$ is the product of a portion of a Vandermonde matrix with the inverse of another Vandermonde matrix.
 
@@ -365,7 +365,7 @@ so coding shreds do not need zero-padding.
 
 ## Signing
 
-### Legacy 
+### Legacy
 When using the legacy authentication method,
 the block producer populates the signature field of data shreds and code shreds with the Ed25519 signature of the bytes in the packet that follow the signature field,
 including any zero padding.
@@ -377,7 +377,7 @@ When using the Merkle authentication method,
 the block producer constructs the [canonical Merkle tree](core/merkle-tree.md) from each shred in an FEC set,
 with the data shreds in sequence followed by the coding shreds in sequence.
 The leaf nodes for both shred types are the bytes
-from immediately after the signature field 
+from immediately after the signature field
 to immediately before the Merkle proof section.
 All hashes are truncated to 20 bytes,
 and the last 12 bytes of each SHA256 hash are immediately discarded.
@@ -402,12 +402,12 @@ The Merkle proof section is composed of the following:
 | end-$20h$-20     | 20B  | Truncated Merkle hash | Root hash of the Merkle tree |
 | end-$20h$  | 20B  | Truncated Merkle hash | Merkle hash of sibling leaf node     |
 | end-$20h$+20  | 20B  | Truncated Merkle hash | Merkle hash of sibling of parent of leaf node     |
-| ... |  ... |  ... |  ... | 
+| ... |  ... |  ... |  ... |
 | end-20        | 20B  | Truncated Merkle hash | Merkle hash of child of root |
 
 The Merkle proof contains the other information needed to compute the full branch from the leaf in the packet to the root.
-For example, in [canonical Merkle tree Figure 2](core/merkle-tree.md#figure_2), 
-the proof for `L0` contains `Iζ` (root hash) followed by the hash `L1` (sibling leaf node), 
+For example, in [canonical Merkle tree Figure 2](core/merkle-tree.md#figure_2),
+the proof for `L0` contains `Iζ` (root hash) followed by the hash `L1` (sibling leaf node),
 `Iβ` and `Iε`.
 It does not include `Iα` or `Iδ` as those can be computed from the included information.
 The proof for `L3` contains `Iζ`, `L2`, `Iα`, and `Iε`.
@@ -416,7 +416,7 @@ Notice that the root hash is treated separately from the rest of the tree and co
 even though the other entries in the proof go from leaf to root.
 
 As described previously, the leaf nodes for both shred types are the bytes
-from immediately after the signature field 
+from immediately after the signature field
 to immediately before the Merkle proof section.
 
 A compliant implementation must validate that
