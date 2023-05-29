@@ -1,6 +1,7 @@
 import csv
 from pathlib import Path
 import struct
+from ..core.base58 import b58encode, b58decode
 from ..core.chacha20rng import ChaCha20Rng
 from ..core.weighted_index import WeightedIndex
 
@@ -13,7 +14,6 @@ class LeaderSchedule:
     @staticmethod
     def derive(epoch, stake_weights, rotations, slots_per_rotation) -> "LeaderSchedule":
         stake_weights = stake_weights.copy()
-        # TODO sort by (stake, b58decode(leader_pubkey_str)))
         stake_weights.sort(key=lambda x: (x[1], x[0]), reverse=True)
         weighted_index = WeightedIndex(map(lambda x: x[1], stake_weights))
 
@@ -37,14 +37,15 @@ class LeaderSchedule:
 
 
 def test():
+    fixtures = Path(__file__).parents[1] / "fixtures"
+    epoch_stakes_path = fixtures / "epoch-stakes-mainnet-454.csv"
+    leader_schedule_path = fixtures / "leader-schedule-454.txt"
+
     # Read list of epoch stakes
-    epoch_stakes_path = (
-        Path(__file__).parents[1] / "fixtures" / "epoch-stakes-mainnet-454.csv"
-    )
     with open(epoch_stakes_path) as f:
         rows = csv.reader(f)
         next(rows)  # skip header
-        weights = list(map(lambda row: (row[0], int(row[1])), rows))
+        weights = list(map(lambda row: (b58decode(row[0]), int(row[1])), rows))
 
     schedule = LeaderSchedule.derive(
         epoch=454,
@@ -52,9 +53,12 @@ def test():
         rotations=108000,
         slots_per_rotation=4,
     )
-    for leader in schedule:
-        print(leader)
-    # TODO check result against fixture
+    # Read expected leader schedule
+    with open(leader_schedule_path) as f:
+        expected_schedule = map(lambda s: b58decode(s.strip()), iter(f))
+        for i, tuple in enumerate(zip(schedule, expected_schedule)):
+            got, expected = tuple
+            assert got == expected, f"at {i} got: {got}, expected: {expected}"
 
 
 if __name__ == "__main__":
