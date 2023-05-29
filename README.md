@@ -26,3 +26,15 @@ such as verification and state transition rules.
 The first long-term objective of the specification effort is to produce a complete and unambiguous reference for implementing a Solana validator.
 
 Other documentation regarding widely adopted protocols may be added at the discretion of the Solana Foundation.
+
+## Reference Code
+
+The `solana_specs` module contains Python 3.10 implementations of various specs.
+
+Each unit is runnable as a test, like so:
+
+```
+python3.10 -m solana_specs.consensus.leader_schedule
+```
+
+The reference code is formatted using [black](https://black.readthedocs.io/en/stable/).
