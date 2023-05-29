@@ -38,3 +38,10 @@ python3.10 -m solana_specs.consensus.leader_schedule
 ```
 
 The reference code is formatted using [black](https://black.readthedocs.io/en/stable/).
+
+Certain tests depend on test fixtures which are hosted on [Git LFS](https://git-lfs.com/).
+To download test fixtures, run:
+
+```shell
+git lfs pull
+```
