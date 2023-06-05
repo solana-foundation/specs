@@ -225,7 +225,7 @@ and the associated metadata is computed.
 First, we must compute $S$, the size of the payload of each data shred.
 * For shreds using the Legacy authentication scheme, $S$ has a hardcoded value of 1051.
 This is small enough to ensure that they payload of a code shred can cover the data shred's headers while still fitting in 1228 bytes.
-* For shreds using the Merkle authentication scheme, $S = 1095 - 20 \lceil \log_2 (N+K) \rceil$,
+* For shreds using the Merkle authentication scheme, $S = 1115 - 20 \lceil \log_2 (N+K) \rceil$,
 where $N+K$ is the total number of data and code shreds in the FEC set
 (see next section for details.
 Unfortunately, this means the definition is somewhat circular,
@@ -312,9 +312,9 @@ When using Merkle authentication,
 the interpretation of "data shred" used for erasure coding begins immediately after the signature field
 and ends immediately before the Merkle proof section.
 
-Let $x_{i,b}$ be the $b$-th byte of the $i$-th data shred of the FEC set (numbered $0, 1, \ldots, N-1$) interpreted as an element of the finite field $GF(2^8)$ (i.e. $\mathbb{F}_2[\gamma] / (\gamma^8 + \gamma^4 + \gamma^3 + \gamma^2 + 1)$).
+Let $x_{i,b}$ be the $b$-th byte of the $i$-th data shred of the FEC set (numbered $0, 1, \ldots, N-1$) interpreted as an element of the finite field $GF(2^8)$ (i.e.  $\mathbb{F}_2[\gamma] / (\gamma^8 + \gamma^4 + \gamma^3 + \gamma^2 + 1)$ ).
 
-Taking one $b$ at a time, define the polynomial $P_b(x)$ of order less than $N$ such that $P_b(i) = x_i$ for all $0\le i < N$ (interpreting the byte value of $i$ as an element of $GF(2^8)$).
+Taking one $b$ at a time, define the polynomial $P_b(x)$ of order less than $N$ such that $P_b(i) = x_i$ for all $0\le i < N$ (interpreting the byte value of $i$ as an element of $GF(2^8)$ ).
 This polynomial is unique.
 
 Then the $b$-th byte of each code shred comes from evaluating $P_b$ as subsequent points.
@@ -322,6 +322,7 @@ More precisely, let $y_{j,b}$ be the $b$-th byte of the $j$-th code shred for $0
 Then $y_{j,b} = P_b(N+j)$, where $N+j$ is computed as an integer and then interpreted as an element of $GF(2^8)$.
 
 Equivalently, this is a linear operation, so it can also be described as a matrix-vector product over $GF(2^8)$:
+
 $$ M \left( \begin{array}{c}
 x_{0,b} \\
 x_{1,b} \\
@@ -374,13 +375,15 @@ including any zero padding.
 ### Merkle
 
 When using the Merkle authentication method,
-the block producer constructs the [canonical Merkle tree](core/merkle-tree.md) from each shred in an FEC set,
+the block producer constructs the [canonical Merkle tree](/core/merkle-tree.md) from each shred in an FEC set,
 with the data shreds in sequence followed by the coding shreds in sequence.
 The leaf nodes for both shred types are the bytes
 from immediately after the signature field
 to immediately before the Merkle proof section.
 All hashes are truncated to 20 bytes,
 and the last 12 bytes of each SHA256 hash are immediately discarded.
+Leaf nodes use a prefix of `\x00SOLANA_MERKLE_SHREDS_LEAF` and interior nodes use a prefix of `\x01SOLANA_MERKLE_SHREDS_NODE`.
+Both prefixes are 26 bytes and are not `\0`-terminated.
 
 The block producer computes the Ed25519 signature of the root of the Merkle tree
 and stores the signature in the signature field of the common header.
@@ -397,23 +400,19 @@ Let $h=\lceil \log_2 (N+K) \rceil$ be the height of the Merkle tree for an FEC s
 (including the leaf nodes but not the root).
 The Merkle proof section is composed of the following:
 
-| Offset        | Size | Type                  | Description                  |
-|---------------|-----:|-----------------------|------------------------------|
-| end-$20h$-20     | 20B  | Truncated Merkle hash | Root hash of the Merkle tree |
-| end-$20h$  | 20B  | Truncated Merkle hash | Merkle hash of sibling leaf node     |
-| end-$20h$+20  | 20B  | Truncated Merkle hash | Merkle hash of sibling of parent of leaf node     |
-| ... |  ... |  ... |  ... |
-| end-20        | 20B  | Truncated Merkle hash | Merkle hash of child of root |
+| Offset           | Size | Type                  | Description                                      |
+|------------------|-----:|-----------------------|--------------------------------------------------|
+| end- $20h$       | 20B  | Truncated Merkle hash | Merkle hash of sibling leaf node                 |
+| end- $20h$ + 20  | 20B  | Truncated Merkle hash | Merkle hash of sibling of parent of leaf node    |
+| ...              |  ... |  ... |  ... |
+| end-20           | 20B  | Truncated Merkle hash | Merkle hash of child of root                     |
 
 The Merkle proof contains the other information needed to compute the full branch from the leaf in the packet to the root.
-For example, in [canonical Merkle tree Figure 2](core/merkle-tree.md#figure_2),
-the proof for `L0` contains `Iζ` (root hash) followed by the hash `L1` (sibling leaf node),
+For example, in [canonical Merkle tree Figure 2](/core/merkle-tree.md#figure_2),
+the proof for `L0` contains the hashes `L1` (sibling leaf node),
 `Iβ` and `Iε`.
-It does not include `Iα` or `Iδ` as those can be computed from the included information.
-The proof for `L3` contains `Iζ`, `L2`, `Iα`, and `Iε`.
-
-Notice that the root hash is treated separately from the rest of the tree and comes first instead of last,
-even though the other entries in the proof go from leaf to root.
+It does not include `Iα`, `Iδ`, or `Iζ` as those can be computed from the included information.
+The proof for `L3` contains `L2`, `Iα`, and `Iε`.
 
 As described previously, the leaf nodes for both shred types are the bytes
 from immediately after the signature field
