@@ -1,4 +1,4 @@
-# Solana Protocol Specifications and Tests (SPST)
+# Solana Protocol Specifications and Tests (SPSaT)
 
 This repository hosts protocol specifications of the Solana network, collaborated and maintained by ecosystem partners.
 
@@ -12,11 +12,13 @@ This repository hosts protocol specifications of the Solana network, collaborate
 |    *gossip* | P2P gossip protocol |
 |   *turbine* | Transaction propagation protocol |
 |       *api* | Client-facing node APIs (e.g. JSON-RPC) |
+|       *STL* | Solana Transport Layer Protocl |
+|*Other major components* | To be covered over the time |
 
 ## Community
 
 This repo exists to define a single source of truth for consensus-critical sections of the protocol, such as verification and state transition rules.
 
-The first long-term objective of the specification effort is to produce a complete and unambiguous Solana validator implementati0n specifications and conformance tests.
+The objective of the Solana Protocl Specification and Tests (SPSaT) initiative is to produce a complete implementati0n formal specifications and langusage agnostic conformance tests expanding coverage to major components.
 
 Other documentation regarding widely adopted protocols may be added at the discretion of the Solana Foundation.
