@@ -9,6 +9,17 @@ message FeatureSet {
   repeated fixed64 features = 1;
 }
 
+message PdaInput {
+  // The PDA base.  (32 bytes)
+  bytes base = 1;
+
+  // The PDA seed
+  bytes seed = 2;
+
+  // The PDA owner.  (32 bytes)
+  bytes owner = 3;
+}
+
 // The complete state of an account excluding its public key.
 message AcctState {
   // The account address.  (32 bytes)
@@ -27,6 +38,10 @@ message AcctState {
 
   // Address of the program that owns this account.  (32 bytes)
   bytes owner = 6;
+
+  // The account address, but derived as a PDA.  Overrides `address`
+  // if present.
+  PdaInput pda = 7;
 }
 
 // EpochContext includes context scoped to an epoch.
