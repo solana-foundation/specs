@@ -94,12 +94,12 @@ Contents of nodes:
 - `L2 := sha256(concat(0x00, data[2]))`
 - `L3 := sha256(concat(0x00, data[3]))`
 - `L4 := sha256(concat(0x00, data[4]))`
-- `Iα := sha256(concat(0x01, hash(L0), hash(L1)))`
-- `Iβ := sha256(concat(0x01, hash(L2), hash(L3)))`
-- `Iγ := sha256(concat(0x01, hash(L4), hash(L4)))`
-- `Iδ := sha256(concat(0x01, hash(Iα), hash(Iβ)))`
-- `Iε := sha256(concat(0x01, hash(Iγ), hash(Iγ)))`
-- `Iζ := sha256(concat(0x01, hash(Iδ), hash(Iε)))`
+- `Iα := sha256(concat(0x01, L0, L1))`
+- `Iβ := sha256(concat(0x01, L2, L3))`
+- `Iγ := sha256(concat(0x01, L4, L4))`
+- `Iδ := sha256(concat(0x01, Iα, Iβ))`
+- `Iε := sha256(concat(0x01, Iγ, Iγ))`
+- `Iζ := sha256(concat(0x01, Iδ, Iε))`
 
 ### List Equality Check
 
