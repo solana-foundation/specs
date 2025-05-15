@@ -7,6 +7,7 @@ This repository hosts protocol specifications of the Solana network, maintained 
 |       Section | Description                             |
 |--------------:|-----------------------------------------|
 |      *[core]* | Basic concepts and data structures      |
+|    *[gossip]* | Protocol for network communication      |
 | *[consensus]* | Blockchain consensus rules              |
 |   *[runtime]* | On-chain runtime environment (Sealevel) |
 |       *[p2p]* | Validator network protocols             |
@@ -17,6 +18,7 @@ This repository hosts protocol specifications of the Solana network, maintained 
   [runtime]: ./runtime/
   [p2p]: ./p2p/
   [api]: ./api/
+  [gossip]: ./gossip/
 
 ## Community
 
